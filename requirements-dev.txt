@@ -1,0 +1,4 @@
+# Install the desired Home Assistant version with its official constraints first.
+# The CI workflow exercises both the minimum version and the current version.
+pytest==9.1.1
+pytest-asyncio==1.4.0

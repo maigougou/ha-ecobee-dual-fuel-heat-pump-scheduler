@@ -1,0 +1,41 @@
+name: Bug report
+description: Report an unexpected blueprint decision or failed action.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe what you expected and what happened. Please remove credentials,
+        thermostat serial numbers, account information, and home addresses from
+        traces or screenshots. Do not post your full Home Assistant configuration.
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home Assistant Core version
+      placeholder: "2026.10.1"
+    validations:
+      required: true
+  - type: input
+    id: blueprint-version
+    attributes:
+      label: Blueprint version or commit
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include local time, schedule window, thermostat HVAC mode, and Aux switch state.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Relevant options
+      description: Observation mode, cutoff management, weekdays, timeout, and attempts. Use generic entity names.
+  - type: textarea
+    id: trace
+    attributes:
+      label: Sanitized trace or error
+      description: Automation trace details help distinguish configuration, policy, and cloud acknowledgement problems.
+      render: text

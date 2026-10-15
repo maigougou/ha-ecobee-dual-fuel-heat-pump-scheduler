@@ -1,0 +1,79 @@
+ecobee Dual-Fuel Heat Pump Scheduler: ecobee 双热源定时切换（中文版）
+1 · Equipment: 1 · 设备选择
+Use the native ecobee integration. Both entities must belong to the same thermostat.: 使用 HA 原生 ecobee 集成，下方两个实体必须属于同一台温控器。
+ecobee thermostat: ecobee 温控器
+Auxiliary heat only switch: 仅辅助供暖开关
+Select Auxiliary heat only, NOT a ventilator or other switch. Aux must be your intended backup heat source.: 请选择名为 Auxiliary
+  heat only 的开关，不要选择新风机或其他开关。辅助供暖应对应你希望使用的备用热源，例如燃气炉。
+2 · Heat pump preferred window: 2 · 热泵优先时段
+? 'Within the window: normal Heat with native auxiliary backup. Outside: Auxiliary heat only. HA local time; weekdays name
+  the start day.'
+: 时段内允许热泵供暖，允许 ecobee 按本机阈值调用辅助供暖；时段外使用仅辅助供暖。使用 HA 本地时间，星期指时段开始的日期。
+Window begins: 开始时间
+Window ends: 结束时间
+Window start days: 开始日期（星期）
+Monday: 星期一
+Tuesday: 星期二
+Wednesday: 星期三
+Thursday: 星期四
+Friday: 星期五
+Saturday: 星期六
+Sunday: 星期日
+3 · Optional compressor outdoor cutoff: 3 · 压缩机最低室外温度（可选）
+? Normally leave this off and configure the thermostat's equipment protection directly. If enabled, verify your heat pump's
+  approved operating limit first. This is a persistent setting, NOT restored when the automation stops.
+: 通常保持关闭，直接在温控器上设置设备保护阈值。启用前，请确认热泵允许的最低运行温度。此设置会保存在温控器上，停用自动化不会恢复原值。
+Manage compressor minimum outdoor temperature: 由自动化管理压缩机最低室外温度
+Compressor minimum temperature number (optional): 压缩机最低室外温度实体（可选）
+Required only when management is enabled. Choose the ecobee Compressor minimum temperature number on the same device.: 仅在启用上方管理选项时需要。请选择同一台
+  ecobee 的 Compressor minimum temperature 数值实体。
+Compressor minimum outdoor temperature: 压缩机最低室外温度
+? Native ecobee increments are 5°F. Labels show °C too; conversion to your entity's unit is automatic. The default is a placeholder,
+  not an equipment recommendation. Never choose below your equipment's approved limit.
+: ecobee 原生设置以 5°F 为步长；选项同时显示摄氏温度，写入时会自动换算为实体使用的单位。默认选项只是占位值，不是设备推荐值。请勿选择低于设备允许下限的温度。
+4 · Operation and verification: 4 · 运行与状态确认
+Observation mode (no equipment commands): 观察模式（不控制设备）
+? Start here. Run actions to see the proposed source in HA Notifications. Turn this off after checking the entities, schedule
+  and thermostat protections.
+: 首次使用请保持开启。点击“运行动作”后，可在 HA 通知中查看计划使用的热源。确认所选实体、时段和温控器保护设置正确后，再关闭观察模式以启用控制。
+Readback timeout per command: 每次操作的状态确认等待时间
+? The cloud integration may take several minutes to refresh. A timeout does not prove a command failed; another attempt checks
+  current state first.
+: 云端状态刷新可能需要几分钟。等待超时不代表操作一定失败；再次尝试前会先检查当前状态。
+Maximum attempts per command per run: 每轮中每项操作的最多尝试次数
+After a failed run, the next periodic check may try again. This is not a lifetime retry limit.: 本轮失败后，下次定时检查仍可能重试。此限制只针对当前这一轮，不限制所有轮次的累计尝试次数。
+Show observation and failure notifications: 显示观察结果和异常通知
+? 'Configuration or availability check failed: {{ expected_policy }}. No equipment command was sent. Check that entities are
+  available and belong to the same native ecobee device.'
+: 配置或设备连接检查未通过：{{ expected_policy }}。未向设备发送控制指令。请确认所选实体可用，且属于原生 ecobee 集成中的同一台设备。
+? 'Observation only: desired mode is {{ ''normal Heat (heat pump permitted, native Aux backup)'' if expected_policy == ''heat''
+  else ''Auxiliary heat only'' }}. Current Aux switch: {{ states(aux_switch) }}. Compressor cutoff management: {{ ''enabled''
+  if manage_cutoff else ''disabled'' }}. {% if manage_cutoff %}Selected cutoff: {{ cutoff_f }}°F / {{ ((cutoff_f | float -
+  32) * 5 / 9) | round(1) }}°C; currently {{ states(cutoff_entity) }} {{ state_attr(cutoff_entity, ''unit_of_measurement'')
+  }}. This cutoff is reconciled only during the heat-pump window. {% endif %}No equipment command was sent. Thermostat schedule
+  and room temperatures are untouched.'
+: 仅观察：当前时段应使用{{ '正常制暖，允许辅助供暖' if expected_policy == 'heat' else '仅辅助供暖' }}。仅辅助供暖开关当前{{ '开启' if is_state(aux_switch, 'on')
+  else '关闭' if is_state(aux_switch, 'off') else '状态未知' }}。压缩机最低室外温度管理{{ '已启用' if manage_cutoff else '未启用' }}。{% if manage_cutoff
+  %}所选下限：{{ cutoff_f }}°F / {{ ((cutoff_f | float - 32) * 5 / 9) | round(1) }}°C；当前值：{{ states(cutoff_entity) }} {{ state_attr(cutoff_entity,
+  'unit_of_measurement') }}。仅在热泵优先时段内核对和调整这个下限。{% endif %}未向设备发送控制指令，温度日程和房间温度设置保持不变。
+'Observation mode: no equipment commands.': 观察模式：未向设备发送控制指令。
+Policy, HVAC mode or entity availability changed. The next run will reconcile.: 当前时段、温控器模式或设备连接状态发生变化。本轮操作已停止，下次运行将重新检查。
+? Compressor cutoff was not confirmed. No transition to heat-pump-permitted mode was attempted. Check the number entity and
+  cloud connection; the next periodic run may retry.
+: 未能确认压缩机最低室外温度，因此未尝试切换到热泵优先模式。请检查温度数值实体和云端连接；下次定时检查可能重试。
+Compressor cutoff changed before heat-mode confirmation. Stopped; the next run will recheck the cutoff.: 在确认制暖模式前，压缩机最低室外温度发生变化。本轮操作已停止，下次运行将重新检查该下限。
+? Heat source mode was not confirmed. Inspect the thermostat and HA trace. This checks the reported mode, not physical heat
+  output. The next periodic run may retry.
+: 未能确认热源模式，请检查温控器和 HA 自动化跟踪记录。这里检查的是温控器返回的模式，不能据此确认设备已经供热。下次定时检查可能重试。
+Managed Auto controller (optional): 自动冷暖控制器（可选）
+? Select the switch from the optional ecobee Managed Auto integration. It uses this schedule in Heat/Cool and pauses this
+  Blueprint while controlling the same thermostat. Leave empty for Heat-only scheduling.
+: 选择可选 ecobee Managed Auto 集成的开关。控制器在自动冷暖模式使用本日程，接管同一温控器期间暂停此 Blueprint。仅制暖调度请留空。
+? Schedule normal Heat (heat pump permitted with ecobee auxiliary backup) versus Auxiliary heat only. Keeps ecobee temperatures,
+  Comfort Settings and sensor participation intact. Requires native ecobee integration and a dual-fuel installation. Runs
+  only in Heat; optional Managed Auto integration handles Heat/Cool using this same schedule. Off and native Cool are left
+  alone. Starts in observation mode. Disabling this automation leaves the last device settings in place. Cloud control is
+  not an exact-time or offline guarantee. Version 0.2.0.
+: 按时段在“正常制暖，允许辅助供暖”和“仅辅助供暖”之间切换。温度日程、舒适设置和参与控温的房间传感器仍由 ecobee 管理。需要 HA 原生 ecobee 集成及已正确配置的双热源系统。仅在制暖模式下运行；关闭、制冷和冷暖自动模式下不作调整。首次默认开启观察模式。停用自动化后，温控器保留最后的设置。云端通信可能延迟，无法保证准点切换或离线切换。版本
+  0.2.0。 可选 Managed Auto 集成可使用同一日程调度自动冷暖。
+Thermostat is outside Heat scheduling or Managed Auto owns the mode. No equipment command was sent.: 当前不属于纯制暖调度，或自动冷暖控制器已接管。未向设备发送指令。

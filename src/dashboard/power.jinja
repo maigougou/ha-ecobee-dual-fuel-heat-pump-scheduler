@@ -1,0 +1,10 @@
+{%- macro power(entity) -%}
+{%- if entity -%}
+{%- set value = states(entity) -%}
+{%- set unit = state_attr(entity, 'unit_of_measurement') -%}
+{%- if not is_number(value) -%}<p><small>__power_unknown__</small></p>
+{%- elif unit not in ['W', 'kW'] -%}<p><small>__power_unit_error__</small></p>
+{%- else -%}<h2>{{ value | float | round(3 if unit == 'kW' else 1) }} <small>{{ unit }}</small></h2>
+{%- endif -%}
+{%- endif -%}
+{%- endmacro -%}

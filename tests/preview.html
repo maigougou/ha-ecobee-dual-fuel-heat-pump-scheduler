@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ecobee seasonal card test fixture</title>
+<style>body{font-family:system-ui;margin:0;padding:24px;background:#111b25;color:#e9eff7;--primary-text-color:#e9eff7;--secondary-text-color:#9ba8b7;--primary-color:#4dc3e7;--divider-color:#ffffff18;--ha-card-background:#ffffff08;--card-background-color:#1a2633;--error-color:#f78378}main{max-width:1100px;margin:auto}nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}label{display:flex;gap:8px;align-items:center}select,button{font:inherit}ha-card{display:block;border:1px solid #ffffff22;border-radius:22px;background:var(--ha-card-background);overflow:hidden}ha-icon{display:inline-block;width:24px;height:24px;font-size:20px;line-height:24px;text-align:center}h1{font-size:18px}p{color:var(--secondary-text-color);font-size:12px}</style>
+<main><h1>Seasonal card preview</h1><p>Simulated equipment and history. No Home Assistant connection or device commands.</p><nav>
+<label>Mode <select id="mode"><option value="cool">Cool</option><option value="heat">Heat</option><option value="heat_cool">Auto</option><option value="off">Off</option><option value="unavailable">Unavailable</option></select></label>
+<label>Activity <select id="activity"><option value="compCool2,fan">Cooling stage 2</option><option value="heatPump2,fan">Heat pump stage 2</option><option value="auxHeat2">Furnace stage 2</option><option value="fan">Fan</option><option value="">Idle</option></select></label>
+<label>Language <select id="language"><option value="en">English</option><option value="zh">中文</option></select></label>
+<label>Power <select id="power"><option value="both">Both circuits</option><option value="hp">Heat pump only</option><option value="none">None</option></select></label>
+<label>Theme <select id="theme"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+</nav><ecobee-dual-fuel-card></ecobee-dual-fuel-card></main>
+<script type="module">
+import {runtimeReport, activityEnergy, normalizeConfig} from '../ecobee-dual-fuel-card.js';
+customElements.define('ha-card',class extends HTMLElement{connectedCallback(){this.style.display='block';this.style.background='var(--ha-card-background)';this.style.border='1px solid var(--divider-color)';}});
+customElements.define('ha-icon',class extends HTMLElement{connectedCallback(){this.textContent=({'mdi:snowflake':'❄','mdi:fire':'♨','mdi:fan':'◉','mdi:water-percent':'♧','mdi:autorenew':'↻','mdi:heat-pump-outline':'◈'})[this.getAttribute('icon')]||'·';}});
+const card=document.querySelector('ecobee-dual-fuel-card'),mode=document.querySelector('#mode'),activity=document.querySelector('#activity'),language=document.querySelector('#language'),power=document.querySelector('#power'),theme=document.querySelector('#theme');
+const schedule={status:'ok',start:'23:00:00',end:'07:00:00',days:['mon','tue','wed','thu','fri','sat','sun'],observation:false};
+const end=Date.parse('2026-10-13T14:00Z'),start=end-8*86400000,history=[],outdoor=[],indoor=[];
+for(let t=start;t<=end;t+=5*60000){const step=Math.floor(t/300000)%18;const eq=step<4?'compCool1,fan':step<6?'compCool2,fan':step===7?'heatPump':step===8?'auxHeat2':step===9?'fan':'';history.push({lu:t/1000,s:'heat_cool',a:{equipment_running:eq}});outdoor.push({lu:t/1000,s:eq.includes('comp')||eq==='heatPump'?'1850':'0',a:{unit_of_measurement:'W'}});indoor.push({lu:t/1000,s:eq?'120':'8',a:{unit_of_measurement:'W'}});}
+card._refreshContext=()=>{};card._refreshReport=()=>{};
+function update(){
+const c=normalizeConfig({entity:'climate.demo',automation:'automation.demo',aux_switch:'switch.demo',heat_pump_power_entity:power.value==='none'?undefined:'sensor.outdoor',furnace_power_entity:power.value==='both'?'sensor.indoor':undefined,language:language.value});
+card._controlContext={schedule,links:{}};card._runtimeReport=runtimeReport(history,schedule,'America/Toronto',start,end);card._reportStatus='ok';
+if(power.value!=='none')card._runtimeReport.activityEnergy=activityEnergy({heatPump:{status:'fulfilled',value:outdoor},...(power.value==='both'?{furnace:{status:'fulfilled',value:indoor}}:{})},history,schedule,'America/Toronto',start,end,c);
+card.setConfig(c);card.hass={language:language.value,config:{time_zone:'America/Toronto',unit_system:{temperature:'°C'}},states:{'climate.demo':{state:mode.value,attributes:{current_temperature:24.6,temperature:24,target_temp_low:22,target_temp_high:24,current_humidity:53,preset_mode:'Home',equipment_running:activity.value,fan:activity.value.includes('fan')?'on':'off'}},'automation.demo':{state:'on'},'switch.demo':{state:'off'},'sensor.outdoor':{state:'1850',attributes:{unit_of_measurement:'W'}},'sensor.indoor':{state:'120',attributes:{unit_of_measurement:'W'}}}};
+const light=theme.value==='light';document.body.style.background=light?'#edf3f8':'#111b25';for(const [k,v]of Object.entries({'--primary-text-color':light?'#172839':'#e9eff7','--secondary-text-color':light?'#536678':'#9ba8b7','--ha-card-background':light?'#ffffffaa':'#ffffff08','--divider-color':light?'#00000020':'#ffffff18'}))document.body.style.setProperty(k,v);document.body.style.color=light?'#172839':'#e9eff7';
+}
+document.querySelectorAll('select').forEach(el=>el.addEventListener('change',update));update();
+</script></html>

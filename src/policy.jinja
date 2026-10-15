@@ -1,0 +1,66 @@
+{# Included at build time; the installed Blueprint has no external dependencies. #}
+{% macro policy() -%}
+  {%- set t = states(thermostat) -%}
+  {%- set a = states(aux_switch) -%}
+  {%- set device = device_id(thermostat) -%}
+  {%- set ecobee_entities = integration_entities('ecobee') -%}
+  {%- set start = start_time.split(':') | map('int') | list -%}
+  {%- set end = end_time.split(':') | map('int') | list -%}
+  {%- set start_s = start[0] * 3600 + start[1] * 60 + (start[2] | default(0)) -%}
+  {%- set end_s = end[0] * 3600 + end[1] * 60 + (end[2] | default(0)) -%}
+  {%- set clock = now() -%}
+  {%- set clock_s = clock.hour * 3600 + clock.minute * 60 + clock.second -%}
+  {%- set names = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] -%}
+  {%- set today = clock.weekday() -%}
+  {%- if not device or device_id(aux_switch) != device
+      or thermostat not in ecobee_entities or aux_switch not in ecobee_entities -%}
+    error:entities_must_share_one_native_ecobee_device
+  {%- elif start_s == end_s or weekdays | length == 0
+      or weekdays | reject('in', names) | list | length > 0 -%}
+    error:invalid_schedule
+  {%- elif t in ['unknown', 'unavailable'] or a not in ['on', 'off'] -%}
+    error:required_entity_unavailable
+  {%- elif managed_auto_entity and (states(managed_auto_entity) not in ['on', 'off']
+      or state_attr(managed_auto_entity, 'thermostat') != thermostat
+      or managed_auto_entity not in integration_entities('ecobee_managed_auto')) -%}
+    error:auto_controller_unavailable_or_mismatched
+  {%- elif managed_auto_entity and state_attr(managed_auto_entity, 'owns_mode') != false -%}
+    skip:managed_auto_owns_mode
+  {%- elif t != 'heat' -%}
+    skip:not_in_heat_mode
+  {%- elif manage_cutoff and cutoff_f | string not in
+      ['-25', '-20', '-15', '-10', '-5', '0', '5', '10', '15', '20',
+       '25', '30', '35', '40', '45', '50', '55', '60', '65'] -%}
+    error:invalid_native_cutoff_step
+  {%- elif manage_cutoff and (cutoff_entity not in ecobee_entities
+      or device_id(cutoff_entity) != device
+      or state_attr(cutoff_entity, 'device_class') != 'temperature'
+      or state_attr(cutoff_entity, 'unit_of_measurement') not in ['°C', '°F']
+      or not is_number(states(cutoff_entity))
+      or not is_number(state_attr(cutoff_entity, 'min'))
+      or not is_number(state_attr(cutoff_entity, 'max'))) -%}
+    error:invalid_or_unavailable_cutoff_entity
+  {%- elif manage_cutoff and (cutoff_value() | float < state_attr(cutoff_entity, 'min') | float
+      or cutoff_value() | float > state_attr(cutoff_entity, 'max') | float) -%}
+    error:cutoff_out_of_range
+  {%- elif start_s < end_s -%}
+    {{- 'heat' if start_s <= clock_s < end_s and names[today] in weekdays else 'aux' -}}
+  {%- elif clock_s >= start_s -%}
+    {{- 'heat' if names[today] in weekdays else 'aux' -}}
+  {%- elif clock_s < end_s -%}
+    {{- 'heat' if names[(today - 1) % 7] in weekdays else 'aux' -}}
+  {%- else -%}
+    aux
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro cutoff_value() -%}
+  {{- (cutoff_f | float - 32) * 5 / 9
+      if state_attr(cutoff_entity, 'unit_of_measurement') == '°C'
+      else cutoff_f | float -}}
+{%- endmacro %}
+
+{% macro cutoff_matches() -%}
+  {{- is_number(states(cutoff_entity))
+      and (states(cutoff_entity) | float - cutoff_value() | float) | abs < 0.15 -}}
+{%- endmacro %}

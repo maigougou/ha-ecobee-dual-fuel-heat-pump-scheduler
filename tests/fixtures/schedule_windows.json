@@ -1,0 +1,281 @@
+{
+ "time_zone": "America/Toronto",
+ "cases": [
+  {
+   "name": "overnight mon 2026-10-12T22:59:59",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T02:59:59Z",
+   "local": "2026-10-12T22:59:59",
+   "expected": "aux"
+  },
+  {
+   "name": "overnight mon 2026-10-12T23:00:00",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T03:00:00Z",
+   "local": "2026-10-12T23:00:00",
+   "expected": "heat"
+  },
+  {
+   "name": "overnight mon 2026-10-13T00:00:00",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T04:00:00Z",
+   "local": "2026-10-13T00:00:00",
+   "expected": "heat"
+  },
+  {
+   "name": "overnight mon 2026-10-13T06:59:59",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T10:59:59Z",
+   "local": "2026-10-13T06:59:59",
+   "expected": "heat"
+  },
+  {
+   "name": "overnight mon 2026-10-13T07:00:00",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T11:00:00Z",
+   "local": "2026-10-13T07:00:00",
+   "expected": "aux"
+  },
+  {
+   "name": "overnight mon 2026-10-13T23:00:00",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-14T03:00:00Z",
+   "local": "2026-10-13T23:00:00",
+   "expected": "aux"
+  },
+  {
+   "name": "same-day mon 2026-10-12T06:59:59",
+   "start": "07:00:00",
+   "end": "23:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-12T10:59:59Z",
+   "local": "2026-10-12T06:59:59",
+   "expected": "aux"
+  },
+  {
+   "name": "same-day mon 2026-10-12T07:00:00",
+   "start": "07:00:00",
+   "end": "23:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-12T11:00:00Z",
+   "local": "2026-10-12T07:00:00",
+   "expected": "heat"
+  },
+  {
+   "name": "same-day mon 2026-10-12T22:59:59",
+   "start": "07:00:00",
+   "end": "23:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T02:59:59Z",
+   "local": "2026-10-12T22:59:59",
+   "expected": "heat"
+  },
+  {
+   "name": "same-day mon 2026-10-12T23:00:00",
+   "start": "07:00:00",
+   "end": "23:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T03:00:00Z",
+   "local": "2026-10-12T23:00:00",
+   "expected": "aux"
+  },
+  {
+   "name": "same-day mon 2026-10-13T12:00:00",
+   "start": "07:00:00",
+   "end": "23:00:00",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T16:00:00Z",
+   "local": "2026-10-13T12:00:00",
+   "expected": "aux"
+  },
+  {
+   "name": "seconds 2026-10-12T23:00:29",
+   "start": "23:00:30",
+   "end": "06:59:45",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T03:00:29Z",
+   "local": "2026-10-12T23:00:29",
+   "expected": "aux"
+  },
+  {
+   "name": "seconds 2026-10-12T23:00:30",
+   "start": "23:00:30",
+   "end": "06:59:45",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T03:00:30Z",
+   "local": "2026-10-12T23:00:30",
+   "expected": "heat"
+  },
+  {
+   "name": "seconds 2026-10-13T06:59:44",
+   "start": "23:00:30",
+   "end": "06:59:45",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T10:59:44Z",
+   "local": "2026-10-13T06:59:44",
+   "expected": "heat"
+  },
+  {
+   "name": "seconds 2026-10-13T06:59:45",
+   "start": "23:00:30",
+   "end": "06:59:45",
+   "days": [
+    "mon"
+   ],
+   "utc": "2026-10-13T10:59:45Z",
+   "local": "2026-10-13T06:59:45",
+   "expected": "aux"
+  },
+  {
+   "name": "sun wrap 2026-10-11T23:30:00",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "sun"
+   ],
+   "utc": "2026-10-12T03:30:00Z",
+   "local": "2026-10-11T23:30:00",
+   "expected": "heat"
+  },
+  {
+   "name": "sun wrap 2026-10-12T06:00:00",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "sun"
+   ],
+   "utc": "2026-10-12T10:00:00Z",
+   "local": "2026-10-12T06:00:00",
+   "expected": "heat"
+  },
+  {
+   "name": "sun wrap 2026-10-12T23:30:00",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "sun"
+   ],
+   "utc": "2026-10-13T03:30:00Z",
+   "local": "2026-10-12T23:30:00",
+   "expected": "aux"
+  },
+  {
+   "name": "daily afternoon",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+    "sun"
+   ],
+   "utc": "2026-10-14T19:00:00Z",
+   "local": "2026-10-14T15:00:00",
+   "expected": "aux"
+  },
+  {
+   "name": "daily night",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+    "sun"
+   ],
+   "utc": "2026-10-14T07:00:00Z",
+   "local": "2026-10-14T03:00:00",
+   "expected": "heat"
+  },
+  {
+   "name": "fall back first 01:30",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "sat"
+   ],
+   "utc": "2026-11-01T05:30:00Z",
+   "local": "2026-11-01T01:30:00",
+   "expected": "heat"
+  },
+  {
+   "name": "fall back second 01:30",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "sat"
+   ],
+   "utc": "2026-11-01T06:30:00Z",
+   "local": "2026-11-01T01:30:00",
+   "expected": "heat"
+  },
+  {
+   "name": "spring forward 03:30",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "sat"
+   ],
+   "utc": "2026-03-08T07:30:00Z",
+   "local": "2026-03-08T03:30:00",
+   "expected": "heat"
+  },
+  {
+   "name": "spring forward 07:30",
+   "start": "23:00:00",
+   "end": "07:00:00",
+   "days": [
+    "sat"
+   ],
+   "utc": "2026-03-08T11:30:00Z",
+   "local": "2026-03-08T07:30:00",
+   "expected": "aux"
+  }
+ ]
+}

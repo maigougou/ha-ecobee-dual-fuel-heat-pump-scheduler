@@ -1,0 +1,18 @@
+# Add "ecobee Dual-Fuel Heat Pump" through Add card, or paste this minimal configuration.
+# Select your thermostat and optional entities in the visual editor.
+# No equipment or power-sensor IDs are guessed or required by this example.
+type: custom:ecobee-dual-fuel-card
+language: auto
+show_details: true
+show_runtime_report: true
+history_gap_minutes: 15
+# Electricity is hidden automatically without eligible power sensors.
+show_energy_report: true
+energy_integration_method: trapezoidal
+show_heating_report: true
+show_cooling_report: true
+# Choose outdoor_only to exclude indoor/furnace electricity from reports.
+heat_pump_energy_scope: with_blower
+report_schedule_source: automation
+# For monitoring without a source automation, choose custom and configure
+# report_start, report_end and report_days in the visual editor.

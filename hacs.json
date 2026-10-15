@@ -1,0 +1,5 @@
+{
+  "name": "ecobee Dual-Fuel Heat Pump Scheduler",
+  "homeassistant": "2024.12.0",
+  "render_readme": true
+}

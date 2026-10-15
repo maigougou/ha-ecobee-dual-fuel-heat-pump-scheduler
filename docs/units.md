@@ -1,0 +1,11 @@
+# Temperature units and precision
+
+HA and ecobee display preferences do not change the native encoding of ecobee API temperature fields. The native compressor minimum is exposed by HA's ecobee number platform in Fahrenheit, and HA converts its state to the user's preferred unit. The supported compressor-minimum selections are 5°F steps, approximately 2.78°C apart, as documented by [HA](https://www.home-assistant.io/integrations/ecobee/#number-1). The card presents Celsius for a Celsius HA system and does not write any temperature value.
+
+The Blueprint preserves the selected native Fahrenheit step in `cutoff_f`. For a Celsius number entity it supplies the full calculation `(cutoff_f - 32) * 5 / 9` to `number.set_value`, with no pre-write decimal rounding; HA converts to its native unit. Readback comparison tolerates the entity's display rounding. It never takes a rounded readback value and writes that value back on the next day. Mode selection does not rewrite the cutoff when it already matches. This avoids an iterative read-round-write loop; it does not eliminate the API's supported discrete steps.
+
+Example: 15°F corresponds to −9.444…°C, displayed as −9.4°C. That is a display representation, not permission to configure arbitrary 0.1°C increments for this threshold. Retaining Fahrenheit encoding does not imply that the thermostat's Celsius UI setting was changed.
+
+Target temperatures are a separate issue. [HA core issue #103384](https://github.com/home-assistant/core/issues/103384) documents an ecobee target showing 21°C in its UI while the backend/API contained a different target. The integration maintainer showed that HA was converting the API's actual `desiredHeat` value. The reporter said ecobee support corrected the thermostat's backend comfort settings. This is one reported case, not a verified diagnosis or guaranteed fix for another installation. Comparing a raw backend value and the thermostat's Comfort Setting is necessary before attributing a particular mismatch to HA arithmetic.
+
+Do not fabricate a precise configured target by rounding every HA target to the nearest 0.5°C. The card retains HA's reported target; the scheduler leaves targets, holds, Comfort Settings and sensor participation alone.

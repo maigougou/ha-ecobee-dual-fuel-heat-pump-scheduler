@@ -1,0 +1,32 @@
+# Copy this automation into your configuration only after importing the blueprint.
+# Replace these example entity IDs with the native ecobee integration entities
+# for the SAME thermostat. Creating it through the HA blueprint form is easier.
+# Observation mode is deliberately enabled: this example does not control HVAC.
+# Merge into your existing automations list; do not overwrite automations.yaml.
+- id: ecobee_dual_fuel_schedule_example
+  alias: Ecobee daily heat source schedule
+  description: Prefer the heat pump overnight and auxiliary heat outside that window.
+  use_blueprint:
+    path: ecobee_dual_fuel_scheduler/ecobee_dual_fuel_scheduler.yaml
+    input:
+      thermostat: climate.example_ecobee
+      aux_switch: switch.example_ecobee_auxiliary_heat_only
+      start_time: "23:00:00"
+      end_time: "07:00:00"
+      weekdays:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sat
+        - sun
+      observation_mode: true
+      manage_cutoff: false
+      # To manage the compressor cutoff, select the correct number entity,
+      # choose a safe cutoff for YOUR equipment, and enable manage_cutoff.
+      # cutoff_entity: number.example_ecobee_compressor_minimum_temperature
+      # cutoff_f: "15"  # Native degrees F; an example, not a recommendation.
+      acknowledgement_timeout: 240
+      max_attempts: 2
+      notify: true

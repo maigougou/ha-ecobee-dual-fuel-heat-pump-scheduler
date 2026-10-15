@@ -1,0 +1,130 @@
+{
+  "config": {
+    "step": {
+      "controller": {
+        "title": "ecobee Managed Auto",
+        "description": "Optional managed Heat/Cool. Uses the selected Blueprint schedule and current ecobee Comfort targets. Outside the heat-pump window it switches between Cool and Auxiliary heat only. Cloud temperature updates can lag by 15 minutes; heat/cool changeover can be delayed. If HA or the cloud is offline the last physical mode remains, so automatic changeover is unavailable. After setup select this Managed Auto switch in the Blueprint’s Auto controller field, then select Heat/Cool on ecobee. Manual HVAC changes disarm the controller.",
+        "data": {
+          "thermostat": "ecobee thermostat",
+          "aux_switch": "Auxiliary heat only switch",
+          "automation": "Source schedule Blueprint automation",
+          "minimum_mode_minutes": "Minimum time between mode changes",
+          "maximum_data_age_minutes": "Maximum runtime age",
+          "acknowledgement_minutes": "Device readback timeout",
+          "resume_after_restart": "Resume after a normal restart",
+          "notify": "Notify about problems",
+          "accept_cloud_limitations": "I understand HA/cloud outages retain the last device mode"
+        },
+        "data_description": {
+          "resume_after_restart": "A normal HA restart retains the selected mode and resumes after device readback. Settings reloads restore native Auto before resuming. After an unexpected shutdown it stays off until you turn it on.",
+          "notify": "Show a Home Assistant notification when native Auto cannot be restored, a manual mode change stops control, a configuration or readback error occurs, or ecobee data is unavailable for over 30 minutes."
+        }
+      },
+      "user": {
+        "title": "ecobee Dual-Fuel Heat Pump Scheduler",
+        "menu_options": {
+          "installation": "Install Blueprint and card",
+          "controller": "Add Managed Auto controller (optional)"
+        }
+      },
+      "installation": {
+        "title": "Install Blueprint and card",
+        "description": "Installs the selected Blueprint and loads the dashboard card. Next, create an automation under Automations & scenes → Blueprints to select your thermostat and times.",
+        "data": {
+          "blueprint_language": "Blueprint language"
+        }
+      }
+    },
+    "error": {
+      "accept_limitations": "Acknowledge the offline/changeover limitation to enable Managed Auto.",
+      "invalid_equipment": "Select matching native ecobee entities with fresh connected runtime data, a heat pump and Auto enabled.",
+      "thermostat_change": "Create a separate entry to manage another thermostat.",
+      "select_native_ecobee_entities": "Select a climate entity and switch from the native ecobee integration.",
+      "entities_must_share_device": "The thermostat and switch must belong to the same ecobee device.",
+      "select_auxiliary_heat_only_switch": "Select that thermostat’s Auxiliary heat only switch.",
+      "native_thermostat_unavailable": "The native ecobee integration has no data for this thermostat yet. Wait for it to load and try again.",
+      "thermostat_offline": "ecobee reports this thermostat as disconnected.",
+      "auto_or_heat_pump_not_supported": "This thermostat needs a heat pump and the Auto (heat/cool) feature enabled in its settings.",
+      "stale_runtime": "ecobee runtime data is older than the maximum runtime age. Wait for the next update or raise the limit.",
+      "invalid_temperature": "ecobee reported an invalid temperature or setpoint.",
+      "invalid_auto_setpoint_gap": "The current heat and cool targets are less than 0.5 °C apart."
+    },
+    "abort": {
+      "already_configured": "This thermostat or package installation is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Managed Auto settings",
+        "description": "Optional managed Heat/Cool. Uses the selected Blueprint schedule and current ecobee Comfort targets. Outside the heat-pump window it switches between Cool and Auxiliary heat only. Cloud temperature updates can lag by 15 minutes; heat/cool changeover can be delayed. If HA or the cloud is offline the last physical mode remains, so automatic changeover is unavailable. After setup select this Managed Auto switch in the Blueprint’s Auto controller field, then select Heat/Cool on ecobee. Manual HVAC changes disarm the controller.",
+        "data": {
+          "thermostat": "ecobee thermostat",
+          "aux_switch": "Auxiliary heat only switch",
+          "automation": "Source schedule Blueprint automation",
+          "minimum_mode_minutes": "Minimum time between mode changes",
+          "maximum_data_age_minutes": "Maximum runtime age",
+          "acknowledgement_minutes": "Device readback timeout",
+          "resume_after_restart": "Resume after a normal restart",
+          "notify": "Notify about problems",
+          "accept_cloud_limitations": "I understand HA/cloud outages retain the last device mode"
+        },
+        "data_description": {
+          "resume_after_restart": "A normal HA restart retains the selected mode and resumes after device readback. Settings reloads restore native Auto before resuming. After an unexpected shutdown it stays off until you turn it on.",
+          "notify": "Show a Home Assistant notification when native Auto cannot be restored, a manual mode change stops control, a configuration or readback error occurs, or ecobee data is unavailable for over 30 minutes."
+        }
+      },
+      "installation": {
+        "title": "Install Blueprint and card",
+        "description": "Installs the selected Blueprint and loads the dashboard card. Next, create an automation under Automations & scenes → Blueprints to select your thermostat and times.",
+        "data": {
+          "blueprint_language": "Blueprint language"
+        }
+      }
+    },
+    "error": {
+      "accept_limitations": "Acknowledge the offline/changeover limitation to enable Managed Auto.",
+      "invalid_equipment": "Select matching native ecobee entities with fresh connected runtime data, a heat pump and Auto enabled.",
+      "thermostat_change": "Create a separate entry to manage another thermostat.",
+      "select_native_ecobee_entities": "Select a climate entity and switch from the native ecobee integration.",
+      "entities_must_share_device": "The thermostat and switch must belong to the same ecobee device.",
+      "select_auxiliary_heat_only_switch": "Select that thermostat’s Auxiliary heat only switch.",
+      "native_thermostat_unavailable": "The native ecobee integration has no data for this thermostat yet. Wait for it to load and try again.",
+      "thermostat_offline": "ecobee reports this thermostat as disconnected.",
+      "auto_or_heat_pump_not_supported": "This thermostat needs a heat pump and the Auto (heat/cool) feature enabled in its settings.",
+      "stale_runtime": "ecobee runtime data is older than the maximum runtime age. Wait for the next update or raise the limit.",
+      "invalid_temperature": "ecobee reported an invalid temperature or setpoint.",
+      "invalid_auto_setpoint_gap": "The current heat and cool targets are less than 0.5 °C apart."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "status": {
+        "name": "Status",
+        "state": {
+          "waiting_for_auto": "Ready · select Heat/Cool",
+          "syncing": "Syncing with the thermostat",
+          "disabled": "Off",
+          "manual_override": "Stopped after manual mode change",
+          "waiting_for_schedule": "Check schedule binding",
+          "schedule_paused": "Paused · schedule off or observing",
+          "configuration_error": "Configuration error",
+          "command_failed": "Mode change not confirmed",
+          "waiting_for_connection": "Waiting for ecobee data",
+          "restoring_auto": "Restoring native Auto",
+          "restore_failed": "Native Auto restore failed",
+          "awaiting_device": "Waiting for thermostat",
+          "minimum_mode_wait": "Minimum mode interval",
+          "heat_pump_window": "Heat-pump window · native Auto",
+          "furnace_selected": "Furnace selected",
+          "cooling_selected": "Cooling selected"
+        },
+        "state_attributes": {
+          "detail": {
+            "name": "Detail"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "config": {
+    "step": {
+      "controller": {
+        "title": "ecobee 自动冷暖调度",
+        "description": "可选的自动冷暖控制器，沿用 Blueprint 时段和 ecobee 当前舒适日程目标。热泵时段外，在制冷与仅炉子供暖之间切换。云端温度可能延迟 15 分钟，冷暖切换可能延后。HA／云端断线时保留最后设备模式，无法自动切换冷暖。安装后，在 Blueprint 的自动冷暖控制器字段选择此开关，再将 ecobee 切为自动冷暖。手动切换冷暖模式会停用控制器。",
+        "data": {
+          "thermostat": "ecobee 温控器",
+          "aux_switch": "仅辅助供暖开关",
+          "automation": "热源日程 Blueprint 自动化",
+          "minimum_mode_minutes": "模式切换最短间隔",
+          "maximum_data_age_minutes": "运行数据最大时效",
+          "acknowledgement_minutes": "设备回读超时",
+          "resume_after_restart": "正常重启后自动恢复",
+          "notify": "出现问题时通知",
+          "accept_cloud_limitations": "我了解 HA／云端断线时设备保留最后模式"
+        },
+        "data_description": {
+          "resume_after_restart": "正常重启 HA 时保留已选择的模式，设备状态确认后继续调度。重新加载设置时先恢复原生 Auto，再恢复调度。意外关机后保持关闭，需要手动启用。",
+          "notify": "无法恢复原生自动冷暖、手动切换模式导致停止、配置或回读出错，以及 ecobee 数据超过 30 分钟不可用时，发送 Home Assistant 通知。"
+        }
+      },
+      "user": {
+        "title": "ecobee Dual-Fuel Heat Pump Scheduler",
+        "menu_options": {
+          "installation": "安装蓝图和卡片",
+          "controller": "添加自动冷暖控制器（可选）"
+        }
+      },
+      "installation": {
+        "title": "安装蓝图和卡片",
+        "description": "自动安装所选语言的蓝图并加载仪表盘卡片。完成后，到“自动化与场景 → 蓝图”创建自动化，选择温控器和时段。",
+        "data": {
+          "blueprint_language": "蓝图语言"
+        }
+      }
+    },
+    "error": {
+      "accept_limitations": "请确认断线及冷暖切换限制后再启用。",
+      "invalid_equipment": "请选择同一台原生 ecobee 温控器的实体，并确保其在线、运行数据新鲜、带热泵且已启用自动冷暖。",
+      "thermostat_change": "管理另一台温控器请新建一个条目。",
+      "select_native_ecobee_entities": "请选择原生 ecobee 集成提供的 climate 实体和开关。",
+      "entities_must_share_device": "温控器和开关必须属于同一台 ecobee 设备。",
+      "select_auxiliary_heat_only_switch": "请选择这台温控器的 Auxiliary heat only 开关。",
+      "native_thermostat_unavailable": "原生 ecobee 集成还没有这台温控器的数据，请等待加载完成后重试。",
+      "thermostat_offline": "ecobee 报告这台温控器已断开连接。",
+      "auto_or_heat_pump_not_supported": "需要带热泵，并在温控器设置中启用自动冷暖（Auto）功能。",
+      "stale_runtime": "ecobee 运行数据超过最大时效，请等待下一次更新或调大时效。",
+      "invalid_temperature": "ecobee 报告的温度或设定值无效。",
+      "invalid_auto_setpoint_gap": "当前制暖与制冷目标相差不足 0.5 °C。"
+    },
+    "abort": {
+      "already_configured": "此设备或安装条目已配置。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "自动冷暖调度设置",
+        "description": "可选的自动冷暖控制器，沿用 Blueprint 时段和 ecobee 当前舒适日程目标。热泵时段外，在制冷与仅炉子供暖之间切换。云端温度可能延迟 15 分钟，冷暖切换可能延后。HA／云端断线时保留最后设备模式，无法自动切换冷暖。安装后，在 Blueprint 的自动冷暖控制器字段选择此开关，再将 ecobee 切为自动冷暖。手动切换冷暖模式会停用控制器。",
+        "data": {
+          "thermostat": "ecobee 温控器",
+          "aux_switch": "仅辅助供暖开关",
+          "automation": "热源日程 Blueprint 自动化",
+          "minimum_mode_minutes": "模式切换最短间隔",
+          "maximum_data_age_minutes": "运行数据最大时效",
+          "acknowledgement_minutes": "设备回读超时",
+          "resume_after_restart": "正常重启后自动恢复",
+          "notify": "出现问题时通知",
+          "accept_cloud_limitations": "我了解 HA／云端断线时设备保留最后模式"
+        },
+        "data_description": {
+          "resume_after_restart": "正常重启 HA 时保留已选择的模式，设备状态确认后继续调度。重新加载设置时先恢复原生 Auto，再恢复调度。意外关机后保持关闭，需要手动启用。",
+          "notify": "无法恢复原生自动冷暖、手动切换模式导致停止、配置或回读出错，以及 ecobee 数据超过 30 分钟不可用时，发送 Home Assistant 通知。"
+        }
+      },
+      "installation": {
+        "title": "安装蓝图和卡片",
+        "description": "自动安装所选语言的蓝图并加载仪表盘卡片。完成后，到“自动化与场景 → 蓝图”创建自动化，选择温控器和时段。",
+        "data": {
+          "blueprint_language": "蓝图语言"
+        }
+      }
+    },
+    "error": {
+      "accept_limitations": "请确认断线及冷暖切换限制后再启用。",
+      "invalid_equipment": "请选择同一台原生 ecobee 温控器的实体，并确保其在线、运行数据新鲜、带热泵且已启用自动冷暖。",
+      "thermostat_change": "管理另一台温控器请新建一个条目。",
+      "select_native_ecobee_entities": "请选择原生 ecobee 集成提供的 climate 实体和开关。",
+      "entities_must_share_device": "温控器和开关必须属于同一台 ecobee 设备。",
+      "select_auxiliary_heat_only_switch": "请选择这台温控器的 Auxiliary heat only 开关。",
+      "native_thermostat_unavailable": "原生 ecobee 集成还没有这台温控器的数据，请等待加载完成后重试。",
+      "thermostat_offline": "ecobee 报告这台温控器已断开连接。",
+      "auto_or_heat_pump_not_supported": "需要带热泵，并在温控器设置中启用自动冷暖（Auto）功能。",
+      "stale_runtime": "ecobee 运行数据超过最大时效，请等待下一次更新或调大时效。",
+      "invalid_temperature": "ecobee 报告的温度或设定值无效。",
+      "invalid_auto_setpoint_gap": "当前制暖与制冷目标相差不足 0.5 °C。"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "status": {
+        "name": "状态",
+        "state": {
+          "waiting_for_auto": "已就绪 · 请切换为自动冷暖",
+          "syncing": "正在同步温控器状态",
+          "disabled": "已关闭",
+          "manual_override": "手动切换模式后已停止",
+          "waiting_for_schedule": "请检查日程绑定",
+          "schedule_paused": "已暂停 · 日程关闭或观察模式",
+          "configuration_error": "配置错误",
+          "command_failed": "模式切换未确认",
+          "waiting_for_connection": "等待 ecobee 数据",
+          "restoring_auto": "正在恢复原生自动冷暖",
+          "restore_failed": "恢复原生自动冷暖失败",
+          "awaiting_device": "等待温控器响应",
+          "minimum_mode_wait": "模式切换最短间隔",
+          "heat_pump_window": "热泵时段 · 原生自动冷暖",
+          "furnace_selected": "已选炉子供暖",
+          "cooling_selected": "已选制冷"
+        },
+        "state_attributes": {
+          "detail": {
+            "name": "详情"
+          }
+        }
+      }
+    }
+  }
+}

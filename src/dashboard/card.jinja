@@ -1,0 +1,77 @@
+{# Edit entity IDs here and in this card's entity_id list. #}
+{%- set climate = 'climate.example_ecobee' -%}
+{%- set aux = 'switch.example_ecobee_auxiliary_heat_only' -%}
+{%- set automation = 'automation.example_ecobee_dual_fuel' -%}
+{%- set temperature_unit = '°C' -%}
+{%- set cutoff_entity = '' -%}
+__POWER_SETTINGS__
+{%- set mode = states(climate) -%}
+{%- set available = mode not in ['unknown', 'unavailable'] -%}
+{%- set raw = state_attr(climate, 'equipment_running') -%}
+{%- set reported = available and raw is string -%}
+{%- set signals = raw.split(',') | map('trim') | reject('equalto', '') | list if reported else [] -%}
+{%- set heat_codes = ['heatPump', 'heatPump2', 'heatPump3'] -%}
+{%- set cool_codes = ['compCool1', 'compCool2'] -%}
+{%- set aux_codes = ['auxHeat1', 'auxHeat2', 'auxHeat3'] -%}
+{%- set fan_codes = ['fan', 'ventilator', 'economizer'] -%}
+{%- set known = heat_codes + cool_codes + aux_codes + fan_codes + ['humidifier', 'dehumidifier', 'compHotWater', 'auxHotWater', 'compWaterHeater'] -%}
+{%- set unknown_codes = signals | reject('in', known) | list -%}
+{%- set heat_active = signals | select('in', heat_codes) | list -%}
+{%- set cool_active = signals | select('in', cool_codes) | list -%}
+{%- set aux_active = signals | select('in', aux_codes) | list -%}
+{%- set fan_report = state_attr(climate, 'fan') -%}
+{%- set comfort = state_attr(climate, 'preset_mode') -%}
+{%- set comfort_label = {'home': '__home__', 'away': '__away__', 'sleep': '__sleep__'}.get(comfort | lower, comfort) if available and comfort else '__no_data__' -%}
+{%- set current = state_attr(climate, 'current_temperature') -%}
+{%- set target = state_attr(climate, 'temperature') -%}
+{%- macro temperature(value) -%}
+{{- (value | round(1)) ~ ' ' ~ temperature_unit if available and value is number else '—' -}}
+{%- endmacro -%}
+{%- macro stage(codes) -%}
+{%- set result = namespace(stage=0) -%}
+{%- for code in codes -%}{%- if code in signals -%}{%- set result.stage = loop.index -%}{%- endif -%}{%- endfor -%}
+{{- '__stage__' if result.stage else '__unknown__' -}}
+{%- endmacro -%}
+{%- macro outdoor_status() -%}
+{%- if not reported -%}__unknown__
+{%- elif heat_active or cool_active -%}
+{%- if heat_active -%}__heating__ · {{ stage(heat_codes) }}{%- endif -%}
+{%- if heat_active and cool_active %}<br>{% endif -%}
+{%- if cool_active -%}__cooling__ · {{ stage(cool_codes) }}{%- endif -%}
+{%- elif unknown_codes -%}__unknown__
+{%- else -%}__not_running__{%- endif -%}
+{%- endmacro -%}
+{%- macro furnace_status() -%}
+{%- if not reported -%}__unknown__
+{%- elif aux_active -%}__aux_heating__ · {{ stage(aux_codes) }}
+{%- elif unknown_codes -%}__unknown__
+{%- else -%}__not_running__{%- endif -%}
+{%- endmacro -%}
+{%- macro blower_status() -%}
+{%- if not available -%}__unknown__
+{%- elif fan_report == 'on' or (fan_report != 'off' and reported and 'fan' in signals) -%}__running__
+{%- elif aux_active and (fan_report == 'off' or (reported and not unknown_codes)) -%}__furnace_controlled__
+{%- elif fan_report == 'off' -%}__not_running__
+{%- elif not reported or unknown_codes -%}__unknown__
+{%- else -%}__not_running__{%- endif -%}
+{%- endmacro -%}
+__POWER_MACRO__
+<table role="presentation" width="100%">
+<tr><td><small>__indoor__</small><h1>{{ temperature(current) }}</h1></td><td align="right"><strong>{{ comfort_label | e }}</strong><br><small>__target__ {% if mode == 'heat_cool' %}{{ temperature(state_attr(climate, 'target_temp_low')) }} – {{ temperature(state_attr(climate, 'target_temp_high')) }}{% else %}{{ temperature(target) }}{% endif %}</small></td></tr>
+</table>
+<p><ha-icon icon="{% if mode == 'cool' %}mdi:snowflake{% elif mode == 'off' %}mdi:power{% else %}mdi:heat-pump-outline{% endif %}"></ha-icon> {% if not available %}__unknown__{% elif mode == 'heat' and is_state(aux, 'on') %}__aux_only__{% elif mode == 'heat' and is_state(aux, 'off') %}__heat__{% elif mode == 'heat' %}__heat_unknown__{% elif mode == 'cool' %}__cool__{% elif mode == 'heat_cool' %}__auto__{% elif mode == 'off' %}__off__{% else %}{{ mode | e }}{% endif %}</p>
+{% if not reported %}<p><small>__unknown__</small></p>{% elif unknown_codes %}<p><small>__check__</small></p>{% elif not heat_active and not cool_active and not aux_active %}<p><small>{% if fan_report == 'on' %}__fan__{% elif not signals %}__idle__{% elif signals | select('in', fan_codes) | list %}__fan__{% else %}__other__{% endif %}</small></p>{% endif %}
+<hr>
+<table role="presentation" width="100%">
+<tr><td width="50%"><ha-icon icon="mdi:heat-pump-outline"></ha-icon> <strong>__outdoor__</strong><p>{{ outdoor_status() }}</p>__OUTDOOR_POWER__</td><td width="50%"><ha-icon icon="mdi:fire"></ha-icon> <strong>__furnace__</strong><p>{% if aux_active %}{{ furnace_status() }}{% else %}__aux_status__: {{ furnace_status() }}{% endif %}<br>__blower__: {{ blower_status() }}</p>__FURNACE_POWER__</td></tr>
+</table>
+__POWER_NOTE__
+{% if is_state(automation, 'off') %}<ha-alert alert-type="info">__schedule_off__</ha-alert>{% elif not is_state(automation, 'on') %}<ha-alert alert-type="warning">__schedule_unknown__</ha-alert>{% endif %}
+<details><summary>__details__</summary>
+<p><small>{% if is_state(automation, 'on') %}__schedule_on__{% elif is_state(automation, 'off') %}__schedule_off__{% else %}__schedule_unknown__{% endif %}</small></p>
+{% if cutoff_entity %}<p><small>__cutoff__: {{ states(cutoff_entity) if is_number(states(cutoff_entity)) else '__no_data__' }} {{ state_attr(cutoff_entity, 'unit_of_measurement') or '' }}</small></p>{% endif %}
+<p><small>__reported__: {{ (raw if signals else '__idle__') | e if reported else '__unknown__' }}</small></p>
+<p><small>__state_explain__</small></p>
+__POWER_DETAILS__
+<p><small>__temp_explain__ __schedule_explain__</small></p>
+</details>

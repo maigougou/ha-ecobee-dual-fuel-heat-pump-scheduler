@@ -1,0 +1,17 @@
+{
+  "name": "ecobee-dual-fuel-card",
+  "version": "0.9.9",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build_card.mjs",
+    "test": "node --test tests/frontend/*.test.mjs",
+    "check": "node --check ecobee-dual-fuel-card.js && node scripts/build_card.mjs --check"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.5"
+  }
+}
